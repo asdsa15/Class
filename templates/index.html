@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <h2>数据概览</h2>
+    <span class="panel-extra" id="overviewScope"></span>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">课程数量</div>
+      <div class="metric-value" id="courseCount">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">课堂数量</div>
+      <div class="metric-value" id="sessionCount">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">今日课堂</div>
+      <div class="metric-value" id="todayCount">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">平均专注度</div>
+      <div class="metric-value" id="avgAttention">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">进行中的课堂</div>
+      <div class="metric-value" id="runningCount">--</div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>最近课堂平均专注度</h2>
+        <span class="panel-extra">按课堂开始时间排列</span>
+      </div>
+      <div class="panel-body">
+        <div class="chart-box"><canvas id="trendChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-half">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>系统运行状态</h2>
+        <button type="button" class="link-btn" id="refreshStatus">刷新</button>
+      </div>
+      <div class="panel-body">
+        <div class="status-list" id="systemStatus">
+          <div class="status-item"><span class="dot wait"></span><b>正在检测…</b></div>
+        </div>
+        <div style="margin-top:14px">
+          <a class="btn btn-primary btn-sm" href="/classroom">进入课堂检测</a>
+          <a class="btn btn-sm" href="/courses" style="margin-left:8px">课程管理</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-head">
+    <h2>最近课堂记录</h2>
+    <a class="link-btn" href="/history">查看全部</a>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>课程</th><th>班级</th><th>日期</th><th>时间段</th><th>时长</th>
+        <th>平均专注度</th><th>评价</th><th>状态</th><th>操作</th>
+      </tr>
+      </thead>
+      <tbody id="recentBody">
+      <tr><td class="empty" colspan="9">加载中…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

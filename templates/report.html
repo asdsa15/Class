@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block page_actions %}
+<a class="btn btn-sm" href="/history">返回历史课堂</a>
+<button type="button" class="btn btn-sm btn-primary" onclick="window.print()">打印 / 导出 PDF</button>
+{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <h2 id="reportTitle">课堂分析报告</h2>
+    <span class="panel-extra">统计口径：行为检测记录与专注度采样记录</span>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-half"><div class="kv"><span>课程名称</span><span id="rCourse">--</span></div></div>
+      <div class="col-half"><div class="kv"><span>班级</span><span id="rClass">--</span></div></div>
+      <div class="col-half"><div class="kv"><span>授课教师</span><span id="rTeacher">--</span></div></div>
+      <div class="col-half"><div class="kv"><span>上课教室</span><span id="rRoom">--</span></div></div>
+      <div class="col-half"><div class="kv"><span>课堂时间</span><span id="rTime">--</span></div></div>
+      <div class="col-half"><div class="kv"><span>课堂时长</span><span id="rDuration">--</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="panel">
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">平均专注度</div>
+      <div class="metric-value" id="rAvg">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">最高专注度</div>
+      <div class="metric-value" id="rMax">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">最低专注度</div>
+      <div class="metric-value" id="rMin">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">采样次数 / 最大学生数</div>
+      <div class="metric-value" id="rCount">--</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">专注度评价</div>
+      <div class="metric-value" id="rLevel" style="font-size:16px;padding-top:6px">--</div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="panel">
+      <div class="panel-head"><h2>课堂专注度趋势</h2><span class="panel-extra">按采样时间</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="trendChart"></canvas></div></div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="panel">
+      <div class="panel-head"><h2>行为数量统计</h2><span class="panel-extra">累计人次</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="behaviorChart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="panel">
+      <div class="panel-head"><h2>行为比例</h2><span class="panel-extra">各类行为占比</span></div>
+      <div class="panel-body">
+        <div class="chart-box"><canvas id="pieChart"></canvas></div>
+        <div class="legend" id="pieLegend"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="panel">
+      <div class="panel-head"><h2>专注度区间分布</h2><span class="panel-extra">采样点落在各区间的次数</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="distChart"></canvas></div></div>
+    </div>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>行为统计明细</h2><span class="panel-extra">权重为系统设计参数</span></div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>行为</th><th>英文类别</th><th class="num">累计人次</th><th class="num">占比</th>
+        <th class="num">平均置信度</th><th class="num">专注度权重</th><th>分类</th>
+      </tr>
+      </thead>
+      <tbody id="behaviorBody"><tr><td class="empty" colspan="7">加载中…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>课堂总结</h2><span class="panel-extra">根据检测数据自动生成</span></div>
+  <div class="panel-body">
+    <ul id="summaryList" style="padding-left:18px;line-height:2"><li>加载中…</li></ul>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/report.js"></script>
+{% endblock %}

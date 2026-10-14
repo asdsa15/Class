@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <div class="toolbar">
+    <span class="field-label">课程</span>
+    <select id="courseFilter" style="width:190px"><option value="">全部课程</option></select>
+    <span class="field-label">日期</span>
+    <input type="date" id="startDate" style="width:150px">
+    <span class="hint">至</span>
+    <input type="date" id="endDate" style="width:150px">
+    <button type="button" class="btn btn-sm" id="filterBtn">查询</button>
+    <div class="spacer"></div>
+    <span class="hint" id="summaryHint"></span>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>课程</th><th>班级</th><th>日期</th><th>时间段</th><th class="num">时长</th>
+        <th class="num">平均专注度</th><th class="num">最高 / 最低</th><th class="num">采样次数</th>
+        <th>状态</th><th>操作</th>
+      </tr>
+      </thead>
+      <tbody id="historyBody">
+      <tr><td class="empty" colspan="10">加载中…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-head">
+    <h2>同一课程多次课堂对比</h2>
+    <div class="page-actions">
+      <select id="compareCourse" style="width:190px"></select>
+      <button type="button" class="btn btn-sm" id="compareBtn">生成对比图</button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="chart-box"><canvas id="compareChart"></canvas></div>
+    <p class="hint" id="compareHint" style="margin-top:8px">选择课程后，可对比该课程历次课堂的平均专注度变化。</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/history.js"></script>
+{% endblock %}

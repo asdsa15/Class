@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+  <div class="toolbar">
+    <span class="field-label">选择课程</span>
+    <select id="courseSelect" style="width:230px"></select>
+    <button type="button" class="btn btn-primary btn-sm" id="startBtn">开始课堂</button>
+    <button type="button" class="btn btn-sm btn-danger" id="stopBtn" disabled>结束课堂</button>
+    <div class="spacer"></div>
+    <label class="checkbox"><input type="checkbox" id="saveResults" checked> 检测结果写入课堂记录</label>
+  </div>
+  <div class="panel-body">
+    <div id="sessionInfo" class="notice">尚未创建课堂：请选择课程后点击「开始课堂」。</div>
+  </div>
+</div>
+<div class="detect-grid">
+  <div class="detect-main">
+    <div class="panel">
+      <div class="tabs">
+        <div class="tab active" data-tab="image">图片检测</div>
+        <div class="tab" data-tab="video">视频检测</div>
+        <div class="tab" data-tab="realtime">实时课堂</div>
+      </div>
+      <div class="tab-panel active" data-panel="image">
+        <div class="toolbar" style="border-top:none;padding:0 0 12px">
+          <input type="file" id="imageFile" accept="image/*">
+          <span class="field-label">置信度阈值</span>
+          <input type="number" id="confInput" value="0.25" step="0.05" min="0.05" max="0.95" style="width:80px">
+          <button type="button" class="btn btn-primary btn-sm" id="imageBtn">开始检测</button>
+        </div>
+        <div class="media" id="imageBox">选择一张课堂图片进行检测，检测结果将显示在这里</div>
+      </div>
+      <div class="tab-panel" data-panel="video">
+        <div class="toolbar" style="border-top:none;padding:0 0 12px">
+          <input type="file" id="videoFile" accept="video/*">
+          <button type="button" class="btn btn-primary btn-sm" id="videoBtn">提交检测任务</button>
+          <span class="hint">系统每 5 帧执行一次检测，视频越长耗时越久</span>
+        </div>
+        <div class="progress" style="margin-bottom:10px"><span id="videoProgress"></span></div>
+        <p class="hint" id="videoStatus">尚未提交视频检测任务</p>
+        <div class="media" id="videoBox" style="margin-top:12px">视频检测完成后，可在此播放带检测框的结果视频</div>
+      </div>
+      <div class="tab-panel" data-panel="realtime">
+        <div class="toolbar" style="border-top:none;padding:0 0 12px">
+          <span class="field-label">视频来源</span>
+          <select id="sourceSelect" style="width:170px">
+            <option value="browser">浏览器摄像头</option>
+            <option value="server">服务器本机摄像头</option>
+            <option value="file">本地视频文件</option>
+          </select>
+          <input type="file" id="realtimeFile" accept="video/*" style="display:none">
+          <button type="button" class="btn btn-primary btn-sm" id="realtimeBtn" disabled>开始实时检测</button>
+          <span class="hint" id="realtimeHint">请先开始课堂</span>
+        </div>
+        <div class="media" id="liveBox">实时检测画面将显示在这里</div>
+        <video id="liveSource" autoplay playsinline muted style="display:none"></video>
+        <canvas id="captureCanvas" style="display:none"></canvas>
+        <div class="log" id="realtimeLog" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="detect-side">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>专注度与行为统计</h2>
+        <span class="panel-extra">A = Σ(Ni×Wi)/Σ(Ni)</span>
+      </div>
+      <div class="panel-body">
+        <div class="score-box">
+          <div class="score-value" id="attentionScore">--</div>
+          <div class="score-label" id="attentionLevel">等待检测数据</div>
+        </div>
+        <div class="chart-box"><canvas id="liveTrend"></canvas></div>
+        <div class="kv"><span>学生人数</span><span id="studentCount">--</span></div>
+        <div class="kv"><span>专注 / 不专注人数</span><span id="focusSplit">--</span></div>
+        <div class="kv"><span>单帧推理耗时</span><span id="detectTime">--</span></div>
+        <div class="behavior-grid" id="behaviorGrid"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>本帧检测目标</h2>
+        <span class="panel-extra" id="detectionHint">--</span>
+      </div>
+      <div class="table-wrap" style="max-height:260px;overflow-y:auto">
+        <table class="table">
+          <thead><tr><th>行为</th><th>英文类别</th><th class="num">置信度</th><th>坐标</th></tr></thead>
+          <tbody id="detectionBody"><tr><td class="empty" colspan="4">暂无检测数据</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/classroom.js"></script>
+{% endblock %}

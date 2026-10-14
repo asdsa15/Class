@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-half">
+    <div class="panel">
+      <div class="panel-head"><h2>账号信息</h2></div>
+      <div class="panel-body">
+        <div class="kv"><span>用户名</span><span id="pUsername">--</span></div>
+        <div class="kv"><span>姓名</span><span id="pRealName">--</span></div>
+        <div class="kv"><span>角色</span><span id="pRole">--</span></div>
+        <div class="kv"><span>账号状态</span><span id="pStatus">--</span></div>
+        <div class="kv"><span>最近登录</span><span id="pLastLogin">--</span></div>
+        <div class="kv"><span>创建时间</span><span id="pCreateTime">--</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>修改姓名</h2><span class="panel-extra">用户名与角色由管理员维护</span></div>
+      <div class="panel-body">
+        <form id="nameForm">
+          <div class="form-row">
+            <label for="profileRealName">姓名</label>
+            <input type="text" id="profileRealName" style="width:100%" maxlength="50">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" id="nameSaveBtn">保存</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-half">
+    <div class="panel">
+      <div class="panel-head"><h2>修改密码</h2></div>
+      <div class="panel-body">
+        <form id="passwordForm">
+          <div class="form-row">
+            <label for="oldPassword">原密码</label>
+            <input type="password" id="oldPassword" style="width:100%" autocomplete="current-password">
+          </div>
+          <div class="form-row">
+            <label for="newPassword">新密码</label>
+            <input type="password" id="newPassword" style="width:100%" autocomplete="new-password">
+          </div>
+          <div class="form-row">
+            <label for="confirmPassword">确认新密码</label>
+            <input type="password" id="confirmPassword" style="width:100%" autocomplete="new-password">
+          </div>
+          <div id="passwordError" class="notice error" style="display:none"></div>
+          <button type="submit" class="btn btn-primary btn-sm" id="passwordSaveBtn">修改密码</button>
+          <p class="hint" style="margin-top:10px">密码要求 6~64 位，且至少包含字母、数字、符号中的两类。</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/profile.js"></script>
+{% endblock %}

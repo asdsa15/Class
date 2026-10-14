@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block page_actions %}
+<button type="button" class="btn btn-primary btn-sm" id="newCourseBtn">新建课程</button>
+{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="toolbar">
+    <span class="field-label">课程名称</span>
+    <input type="text" id="keyword" placeholder="输入课程名称关键字" style="width:200px">
+    <button type="button" class="btn btn-sm" id="searchBtn">查询</button>
+    <div class="spacer"></div>
+    <span class="hint">课程下的课堂记录会随课程一并删除</span>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>课程名称</th><th>授课教师</th><th>班级</th><th>教室</th>
+        <th class="num">课堂数</th><th class="num">平均专注度</th><th>创建时间</th><th>操作</th>
+      </tr>
+      </thead>
+      <tbody id="courseBody">
+      <tr><td class="empty" colspan="8">加载中…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal-mask" id="courseModal">
+  <div class="modal">
+    <div class="modal-head" id="modalTitle">新建课程</div>
+    <div class="modal-body">
+      <form id="courseForm">
+        <input type="hidden" id="courseId">
+        <div class="form-row">
+          <label for="courseName">课程名称</label>
+          <input type="text" id="courseName" style="width:100%" required>
+        </div>
+        <div class="form-row">
+          <label for="className">班级</label>
+          <input type="text" id="className" style="width:100%" placeholder="例如：软件工程 1 班">
+        </div>
+        <div class="form-row">
+          <label for="classroom">上课教室</label>
+          <input type="text" id="classroom" style="width:100%" placeholder="例如：实验楼 A305">
+        </div>
+        <div class="form-row">
+          <label for="description">课程简介</label>
+          <textarea id="description" rows="3" style="width:100%"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-sm" id="cancelBtn">取消</button>
+      <button type="submit" form="courseForm" class="btn btn-primary btn-sm" id="saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/courses.js"></script>
+{% endblock %}

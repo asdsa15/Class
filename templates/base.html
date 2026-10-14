@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} - 课堂专注度分析系统</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="app-brand">课堂专注度分析系统<span>基于 Python Web · YOLOv8 课堂行为检测</span></div>
+  <div class="app-header-right">
+    <span id="modelStatus">模型状态：检查中</span>
+    <div class="sep"></div>
+<a href="/profile" style="color:inherit;text-decoration:none">{{ user.real_name or user.username }}（{{ user.role_name }}）</a>
+    <button type="button" class="link-btn" id="logoutBtn">退出登录</button>
+  </div>
+</header>
+<div class="app-body">
+  <aside class="side-nav">
+    <a class="nav-item {% if active == 'dashboard' %}active{% endif %}" href="/dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="7" height="8" rx="1"/><rect x="13.5" y="3.5" width="7" height="4.5" rx="1"/><rect x="13.5" y="11" width="7" height="9.5" rx="1"/><rect x="3.5" y="14.5" width="7" height="6" rx="1"/></svg>
+      首页概览
+    </a>
+    <a class="nav-item {% if active == 'courses' %}active{% endif %}" href="/courses">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5.2A2.2 2.2 0 0 1 6.2 3H19v15H6.2A2.2 2.2 0 0 0 4 20.2z"/><path d="M8 7.5h7M8 11h5"/></svg>
+      课程管理
+    </a>
+    <a class="nav-item {% if active == 'classroom' %}active{% endif %}" href="/classroom">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M10.5 9.2l4.5 2.8-4.5 2.8z"/></svg>
+      课堂检测
+    </a>
+    <a class="nav-item {% if active == 'history' %}active{% endif %}" href="/history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg>
+      历史课堂
+    </a>
+    {% if user.role == 'admin' %}
+    <a class="nav-item {% if active == 'users' %}active{% endif %}" href="/users">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16.5 5.5h4.5M18.75 3.25v4.5"/></svg>
+      用户管理
+    </a>
+    {% endif %}
+    <a class="nav-item {% if active == 'profile' %}active{% endif %}" href="/profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5"/></svg>
+      个人中心
+    </a>
+  </aside>
+  <main class="app-main">
+    <div class="page-head">
+      <h1>{{ page_title }}</h1>
+      <div class="page-actions">{% block page_actions %}{% endblock %}</div>
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="/static/js/common.js"></script>
+<script>
+  api('/api/system/status').then(function (data) {
+    var box = document.getElementById('modelStatus');
+    var model = data.model || {};
+    if (!model.model_exists) {
+      box.textContent = '模型文件缺失';
+      box.style.color = '#d92d20';
+    } else if (model.loaded) {
+      box.textContent = '检测模型已加载';
+      box.style.color = '#2f9e44';
+    } else {
+      box.textContent = '检测模型待加载';
+      box.style.color = '#909399';
+    }
+  }).catch(function () { /* 忽略状态获取失败 */ });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

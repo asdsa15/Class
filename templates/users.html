@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_actions %}
+<button type="button" class="btn btn-primary btn-sm" id="newUserBtn">创建用户</button>
+{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="toolbar">
+    <span class="field-label">用户名 / 姓名</span>
+    <input type="text" id="userKeyword" placeholder="输入关键字" style="width:180px">
+    <button type="button" class="btn btn-sm" id="userSearchBtn">查询</button>
+    <div class="spacer"></div>
+    <span class="hint">教师账号由管理员创建；已关联课程的教师建议「禁用」而不是删除</span>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>ID</th><th>用户名</th><th>姓名</th><th>角色</th><th>状态</th>
+        <th class="num">课程数</th><th>最近登录</th><th>创建时间</th><th>操作</th>
+      </tr>
+      </thead>
+      <tbody id="userBody">
+      <tr><td class="empty" colspan="9">加载中…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal-mask" id="userModal">
+  <div class="modal">
+    <div class="modal-head" id="userModalTitle">创建用户</div>
+    <div class="modal-body">
+      <form id="userForm">
+        <input type="hidden" id="editUserId">
+        <div class="form-row">
+          <label for="newUsername">用户名</label>
+          <input type="text" id="newUsername" style="width:100%" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <label for="newRealName">姓名</label>
+          <input type="text" id="newRealName" style="width:100%">
+        </div>
+        <div class="form-row" id="passwordRow">
+          <label for="newPassword">密码</label>
+          <input type="password" id="newPassword" style="width:100%" autocomplete="new-password">
+        </div>
+        <div class="form-row" id="confirmPasswordRow">
+          <label for="confirmPassword">确认密码</label>
+          <input type="password" id="confirmPassword" style="width:100%" autocomplete="new-password">
+        </div>
+        <div class="form-row">
+          <label for="newRole">角色</label>
+          <select id="newRole" style="width:100%">
+            <option value="teacher">教师</option>
+            <option value="admin">管理员</option>
+          </select>
+        </div>
+        <div class="form-row" id="statusRow" style="display:none">
+          <label for="newStatus">账号状态</label>
+          <select id="newStatus" style="width:100%">
+            <option value="1">正常</option>
+            <option value="0">已禁用</option>
+          </select>
+        </div>
+        <div id="userFormError" class="notice error" style="display:none"></div>
+        <p class="hint">密码要求 6~64 位，且至少包含字母、数字、符号中的两类。</p>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-sm" id="userCancelBtn">取消</button>
+      <button type="submit" form="userForm" class="btn btn-primary btn-sm" id="userSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+<div class="modal-mask" id="resetModal">
+  <div class="modal">
+    <div class="modal-head">重置密码</div>
+    <div class="modal-body">
+      <p class="hint" id="resetHint" style="margin-bottom:12px"></p>
+      <form id="resetForm">
+        <input type="hidden" id="resetUserId">
+        <div class="form-row">
+          <label for="resetPassword">新密码</label>
+          <input type="password" id="resetPassword" style="width:100%" autocomplete="new-password">
+        </div>
+        <p class="hint">管理员只能设置新密码，无法查看用户原密码。</p>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-sm" id="resetCancelBtn">取消</button>
+      <button type="submit" form="resetForm" class="btn btn-primary btn-sm" id="resetSaveBtn">确认重置</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/users.js"></script>
+{% endblock %}
