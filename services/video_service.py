@@ -38,6 +38,10 @@ _tasks: dict[str, dict[str, Any]] = {}
 _tasks_lock = threading.Lock()
 _MAX_TASKS = 30
 
+# 注意：任务进度保存在**当前进程内存**中。系统按单 worker（单进程）部署运行，
+# 任务提交与进度轮询由同一进程处理；若改为 uvicorn --workers N 多进程部署，
+# 请求可能落到不同进程导致查不到任务，此时需将任务表迁移到 Redis 或数据库。
+
 
 def create_task(
     filename: str,
@@ -59,6 +63,7 @@ def create_task(
         "output_path": str(output_path),
         "session_id": session_id,
         "total_frames": 0,
+        "progress_known": True,
         "processed_frames": 0,
         "detected_frames": 0,
         "fps": 0.0,
@@ -219,20 +224,38 @@ def process_video(task_id: str) -> None:
             else:
                 writer.write(frame)
 
-            if total_frames and (index % 15 == 0 or index == total_frames):
-                progress = round(min(index / total_frames * 100, 99.0), 1)
+            # 进度更新：部分编码的容器读不到总帧数（CAP_PROP_FRAME_COUNT 返回 0），
+            # 此时前端会一直停在 0%。这里按已读帧数给出"进行中"的估算进度，
+            # 并按固定间隔提示已处理帧数，避免进度条看起来卡死。
+            if total_frames:
+                if index % 15 == 0 or index == total_frames:
+                    progress = round(min(index / total_frames * 100, 99.0), 1)
+                    elapsed = time.monotonic() - started_at
+                    speed = index / elapsed if elapsed > 0 else 0.0
+                    remaining = (total_frames - index) / speed if speed > 0 else None
+                    update_task(
+                        task_id,
+                        processed_frames=index,
+                        detected_frames=detected_frames,
+                        progress=progress,
+                        elapsed_seconds=round(elapsed, 1),
+                        fps=round(speed, 1),
+                        eta_seconds=round(remaining, 1) if remaining is not None else None,
+                        message=f"已处理 {index}/{total_frames} 帧，平均 {speed:.1f} FPS",
+                    )
+            elif index % 30 == 0:
+                # 总帧数未知：不给出百分比，只回报已处理帧数与速度
                 elapsed = time.monotonic() - started_at
                 speed = index / elapsed if elapsed > 0 else 0.0
-                remaining = (total_frames - index) / speed if speed > 0 else None
                 update_task(
                     task_id,
                     processed_frames=index,
                     detected_frames=detected_frames,
-                    progress=progress,
                     elapsed_seconds=round(elapsed, 1),
                     fps=round(speed, 1),
-                    eta_seconds=round(remaining, 1) if remaining is not None else None,
-                    message=f"已处理 {index}/{total_frames} 帧，平均 {speed:.1f} FPS",
+                    eta_seconds=None,
+                    progress_known=False,
+                    message=f"已处理 {index} 帧（总帧数未知），平均 {speed:.1f} FPS",
                 )
     except ModelUnavailableError as exc:
         logger.error("视频检测失败（模型不可用）：%s", exc)
@@ -245,8 +268,6 @@ def process_video(task_id: str) -> None:
     finally:
         capture.release()
         writer.release()
-        if db_session is not None:
-            db_session.close()
 
     aggregates = aggregate_scores(attention_scores)
     elapsed = time.monotonic() - started_at
