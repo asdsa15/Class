@@ -369,9 +369,23 @@ def dashboard_overview(db: Session, user: User | None = None) -> dict[str, Any]:
 
     recent = sorted(sessions, key=lambda item: item.start_time or datetime.min, reverse=True)[:8]
     recent_rows = [session_card(db, item) for item in recent]
+    def _trend_label(item: dict) -> str:
+        """折线图横轴标签：同一天可能有多次课堂，仅用月日会出现重复，
+
+        因此在月日之后追加开始时刻（HH:MM），保证每个数据点都能区分。
+        """
+        date_text = item.get("date") or ""
+        start = item.get("start_time") or ""
+        short_date = date_text[5:] if len(date_text) >= 10 else date_text
+        # start_time 为 ISO 格式（YYYY-MM-DDTHH:MM:SS），取其中的时分部分
+        clock = start[11:16] if len(start) >= 16 else ""
+        if short_date and clock:
+            return f"{short_date} {clock}"
+        return short_date or clock
+
     trend = [
         {
-            "label": item["date"][5:] if item["date"] else "",
+            "label": _trend_label(item),
             "value": item["avg_attention"],
             "course_name": item["course_name"],
             "session_id": item["id"],

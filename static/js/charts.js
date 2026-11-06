@@ -42,7 +42,7 @@ var Chart = (function () {
     var height = options.height || 200;
     var env = setup(canvas, height);
     var ctx = env.ctx;
-    var pad = { left: 42, right: 12, top: 14, bottom: 26 };
+    var pad = { left: 42, right: 18, top: 16, bottom: 30 };
     var chartW = env.width - pad.left - pad.right;
     var chartH = height - pad.top - pad.bottom;
     var min = options.min === undefined ? 0 : options.min;
@@ -98,10 +98,21 @@ var Chart = (function () {
     var lastLabelX = -999;
     labels.forEach(function (label, index) {
       var x = xOf(index);
-      var isLast = index === labels.length - 1;
-      if (x - lastLabelX < 56 && !isLast) return;
-      if (isLast && x - lastLabelX < 56) return;
-      ctx.fillText(label, x, height - 8);
+      // 首尾标签贴边会超出画布被裁切：把绘制位置向内收，并改对齐方式
+      var edge = 6;
+      var drawX = x;
+      var align = 'center';
+      if (index === 0) {
+        drawX = Math.max(x, pad.left + edge);
+        align = 'left';
+      } else if (index === labels.length - 1) {
+        drawX = Math.min(x, pad.left + chartW - edge);
+        align = 'right';
+      }
+      if (x - lastLabelX < 56 && index !== labels.length - 1) return;
+      if (index === labels.length - 1 && x - lastLabelX < 56) return;
+      ctx.textAlign = align;
+      ctx.fillText(label, drawX, height - 8);
       lastLabelX = x;
     });
 

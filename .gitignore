@@ -50,13 +50,5 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Local thesis working files (not part of the project source)
-_thesis_work/
-
-# 外部课堂行为数据集（462MB，含三倍增强副本，不入库）
-Student Behaviour Detection.v5i.yolov11/
-# 由该数据集派生的 8 类数据集（存在标注口径冲突，暂不使用）
-datasets/sbd8/
-
 # 外部工具运行时目录（非项目源码）
 .workbuddy/

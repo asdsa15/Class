@@ -2,6 +2,24 @@
 document.addEventListener('DOMContentLoaded', function () {
   var statusBox = document.getElementById('systemStatus');
 
+  /* -------------------- 欢迎区：日期与问候 -------------------- */
+  (function () {
+    var now = new Date();
+    var hour = now.getHours();
+    var greet = hour < 6 ? '夜深了' : hour < 11 ? '上午好' : hour < 14 ? '中午好'
+      : hour < 18 ? '下午好' : '晚上好';
+    var week = ['日', '一', '二', '三', '四', '五', '六'][now.getDay()];
+    var title = document.getElementById('welcomeTitle');
+    var sub = document.getElementById('welcomeSub');
+    var chip = document.getElementById('todayDate');
+    if (title) title.textContent = greet;
+    if (sub) sub.textContent = '课堂专注度分析系统 · 今日数据概览';
+    if (chip) {
+      chip.textContent = now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 '
+        + now.getDate() + ' 日 · 星期' + week;
+    }
+  })();
+
   /* -------------------- 数据统计与最近课堂 -------------------- */
   api('/api/reports/dashboard').then(function (data) {
     document.getElementById('courseCount').textContent = data.course_count;
@@ -11,6 +29,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('avgAttention').innerHTML = data.avg_attention === null
       ? '--'
       : data.avg_attention.toFixed(1) + '<small>%</small>';
+
+    var foot = document.getElementById('avgAttentionFoot');
+    if (foot) {
+      foot.textContent = data.avg_attention === null
+        ? '暂无课堂数据'
+        : '全部 ' + data.session_count + ' 次课堂平均值';
+    }
 
     var trend = data.attention_trend || [];
     Chart.line(document.getElementById('trendChart'), {

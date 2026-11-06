@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- 顶部欢迎区：产品化头部，体现当前用户与系统状态 -->
+<div class="welcome-bar">
+  <div class="welcome-left">
+    <h2 class="welcome-title" id="welcomeTitle">欢迎回来</h2>
+    <p class="welcome-sub" id="welcomeSub">课堂专注度分析系统 · 今日数据概览</p>
+  </div>
+  <div class="welcome-right">
+    <span class="date-chip" id="todayDate"></span>
+  </div>
+</div>
+
 <div class="panel">
   <div class="panel-head">
     <h2>数据概览</h2>
@@ -9,25 +20,31 @@
     <div class="metric">
       <div class="metric-label">课程数量</div>
       <div class="metric-value" id="courseCount">--</div>
+      <div class="metric-foot">已开设课程总数</div>
     </div>
     <div class="metric">
       <div class="metric-label">课堂数量</div>
       <div class="metric-value" id="sessionCount">--</div>
+      <div class="metric-foot">累计分析课堂</div>
     </div>
     <div class="metric">
       <div class="metric-label">今日课堂</div>
       <div class="metric-value" id="todayCount">--</div>
+      <div class="metric-foot">今日进行的课堂</div>
     </div>
     <div class="metric">
       <div class="metric-label">平均专注度</div>
       <div class="metric-value" id="avgAttention">--</div>
+      <div class="metric-foot" id="avgAttentionFoot">全部课堂平均值</div>
     </div>
     <div class="metric">
       <div class="metric-label">进行中的课堂</div>
       <div class="metric-value" id="runningCount">--</div>
+      <div class="metric-foot">正在检测中</div>
     </div>
   </div>
 </div>
+
 <div class="row">
   <div class="col">
     <div class="panel">
@@ -50,14 +67,15 @@
         <div class="status-list" id="systemStatus">
           <div class="status-item"><span class="dot wait"></span><b>正在检测…</b></div>
         </div>
-        <div style="margin-top:14px">
+        <div class="quick-actions">
           <a class="btn btn-primary btn-sm" href="/classroom">进入课堂检测</a>
-          <a class="btn btn-sm" href="/courses" style="margin-left:8px">课程管理</a>
+          <a class="btn btn-sm" href="/courses">课程管理</a>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <div class="panel">
   <div class="panel-head">
     <h2>最近课堂记录</h2>
