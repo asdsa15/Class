@@ -78,11 +78,22 @@ def test_algorithms() -> None:
         "leaning_over_table": 2,
     }
     result = calculate_attention(counts)
-    weighted = 2 * 1.0 + 8 * 1.0 + 15 * 1.0 + 3 * 0.0 + 5 * 0.3 + 2 * 0.2
+    # 权重从 config 读取，避免测试与配置硬编码脱节（当前：举手 0.8 / 阅读 1.0 / 写作 1.0
+    # / 手机 0.0 / 低头 0.3 / 趴桌 0.2）
+    weighted = sum(counts[key] * config.ATTENTION_WEIGHTS[key] for key in counts)
     expected = round(weighted / 35 * 100, 2)
     check("加权平均公式 A = Σ(Ni×Wi)/Σ(Ni)", abs(result.score - expected) < 0.01,
           f"计算值 {result.score}% ，期望 {expected}%")
     check("学生人数统计", result.student_count == 35, f"student_count={result.student_count}")
+
+    # 应到人数口径：以全班为分母时，专注度应体现检出覆盖率
+    capacity_result = calculate_attention(counts, expected_students=50)
+    check("应到人数作分母（全班口径）", abs(capacity_result.score - round(weighted / 50 * 100, 2)) < 0.01,
+          f"计算值 {capacity_result.score}% ，期望 {round(weighted / 50 * 100, 2)}%")
+    check("检出覆盖率计算", capacity_result.expected_students == 50
+          and capacity_result.detected_students == 35
+          and abs(capacity_result.coverage - 70.0) < 0.01,
+          f"覆盖率={capacity_result.coverage}%（检出 {capacity_result.detected_students} / 应到 50）")
     check("专注 / 不专注人数划分", result.focused_count == 25 and result.unfocused_count == 10,
           f"focused={result.focused_count}, unfocused={result.unfocused_count}")
     check("专注度等级判定", result.level in {"非常专注", "比较专注", "中等水平", "偏低", "不专注"},

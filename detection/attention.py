@@ -43,10 +43,26 @@ class AttentionResult:
     weighted_sum: float
     contributions: dict[str, dict[str, Any]] = field(default_factory=dict)
     weights: dict[str, float] = field(default_factory=dict)
+    # 检测覆盖率相关：检出人数、应到人数与覆盖率（%），用于说明结果的可靠性
+    detected_students: int = 0
+    expected_students: int = 0
+    coverage: float = 0.0
 
     @property
     def level(self) -> str:
         return attention_level(self.score)
+
+    @property
+    def coverage_warning(self) -> str:
+        """检测覆盖率不足时的提示文字（覆盖率达到阈值则为空串）。"""
+        if self.expected_students <= 0:
+            return ""
+        if self.coverage < 60.0:
+            return (
+                f"检测覆盖率仅 {self.coverage:.1f}%（检出 {self.detected_students} 人 / "
+                f"应到 {self.expected_students} 人），专注度结果仅供参考"
+            )
+        return ""
 
     @property
     def focused_ratio(self) -> float:
@@ -66,18 +82,26 @@ class AttentionResult:
             "weighted_sum": round(self.weighted_sum, 3),
             "weights": self.weights,
             "contributions": self.contributions,
-            "formula": "A = Σ(N_i × W_i) / Σ(N_i) × 100%",
+            "detected_students": self.detected_students,
+            "expected_students": self.expected_students,
+            "coverage": self.coverage,
+            "coverage_warning": self.coverage_warning,
+            "formula": "A = Σ(N_i × W_i) / max(应到人数, 检出人数) × 100%",
         }
 
 
 def calculate_attention(
     counts: Mapping[str, int] | Iterable[Any],
     weights: Mapping[str, float] | None = None,
+    expected_students: int | None = None,
 ) -> AttentionResult:
     """计算课堂专注度。
 
     :param counts: 行为数量字典，或直接传入检测结果列表；
     :param weights: 行为权重，缺省使用 config.ATTENTION_WEIGHTS；
+    :param expected_students: 班级应到人数。若给出且大于检出人数，
+        则以应到人数作为分母，使专注度反映"全班"水平而不是"被检出者"水平；
+        0 或 None 表示未知，仍按检出人数计算（兼容原有行为）。
     :return: AttentionResult；未检测到学生时 score 为 None。
     """
     if not isinstance(counts, Mapping):
@@ -114,15 +138,24 @@ def calculate_attention(
             "contribution": round(contribution, 3),
         }
 
-    score = round(weighted_sum / total_students * 100, 2) if total_students else None
+    # 分母口径：优先使用班级应到人数，让专注度反映全班水平；
+    # 应到人数未知（0/None）或小于检出人数（数据异常）时回退到检出人数。
+    capacity = int(expected_students or 0)
+    denominator = capacity if capacity > total_students else total_students
+    coverage = round(total_students / denominator * 100, 2) if denominator else 0.0
+    score = round(weighted_sum / denominator * 100, 2) if denominator else None
+
     return AttentionResult(
         score=score,
-        student_count=total_students,
+        student_count=denominator,
         focused_count=focused_count,
         unfocused_count=unfocused_count,
         weighted_sum=weighted_sum,
         contributions=contributions,
         weights=active_weights,
+        detected_students=total_students,
+        expected_students=capacity,
+        coverage=coverage,
     )
 
 

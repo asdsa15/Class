@@ -14,6 +14,12 @@ class CourseCreate(BaseModel):
     course_name: str = Field(..., min_length=1, max_length=100, description="课程名称")
     class_name: str = Field("", max_length=50, description="班级")
     classroom: str = Field("", max_length=50, description="上课教室")
+    student_capacity: int = Field(
+        0,
+        ge=0,
+        le=500,
+        description="班级应到人数（用于以全班为分母计算专注度；0 表示未知）",
+    )
     description: str = Field("", description="课程简介")
     teacher_id: int | None = Field(None, description="授课教师ID（管理员可指定，默认当前用户）")
 
@@ -24,6 +30,7 @@ class CourseUpdate(BaseModel):
     course_name: str | None = Field(None, min_length=1, max_length=100)
     class_name: str | None = Field(None, max_length=50)
     classroom: str | None = Field(None, max_length=50)
+    student_capacity: int | None = Field(None, ge=0, le=500)
     description: str | None = None
     teacher_id: int | None = None
 
@@ -39,6 +46,7 @@ class CourseOut(BaseModel):
     teacher_name: str = ""
     class_name: str = ""
     classroom: str = ""
+    student_capacity: int = 0
     description: str = ""
     create_time: datetime | None = None
     session_count: int = 0

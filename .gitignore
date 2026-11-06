@@ -49,3 +49,6 @@ Thumbs.db
 *.cache
 *.tmp
 *.temp
+
+# Local thesis working files (not part of the project source)
+_thesis_work/

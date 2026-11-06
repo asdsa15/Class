@@ -9,6 +9,7 @@
 * user            新增 status（账号状态）、update_time、last_login_time
 * class_session   新增 analysis_mode、video_path、result_video_path、created_by
 * attention_record 新增 confidence_threshold
+* course           新增 student_capacity（班级应到人数，用于以全班为分母计算专注度）
 * 索引            新增组合索引，提升历史课堂与报告查询效率
 
 运行方式（项目根目录）::
@@ -49,6 +50,11 @@ COLUMNS: list[tuple[str, str, str]] = [
         "attention_record",
         "confidence_threshold",
         "FLOAT NOT NULL DEFAULT 0 COMMENT '本次检测使用的置信度阈值'",
+    ),
+    (
+        "course",
+        "student_capacity",
+        "INT NOT NULL DEFAULT 0 COMMENT '班级应到人数（0 表示未知，专注度按检出人数计算）'",
     ),
 ]
 

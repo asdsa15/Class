@@ -38,6 +38,7 @@ def course_payload(db: Session, course: Course) -> dict[str, Any]:
         "teacher_name": (getattr(teacher, "real_name", "") or getattr(teacher, "username", "")),
         "class_name": course.class_name or "",
         "classroom": course.classroom or "",
+        "student_capacity": int(getattr(course, "student_capacity", 0) or 0),
         "description": course.description or "",
         "create_time": course.create_time,
         "session_count": session_count,
@@ -90,6 +91,7 @@ def create_course(
         teacher_id=teacher_id,
         class_name=payload.class_name,
         classroom=payload.classroom,
+        student_capacity=payload.student_capacity,
         description=payload.description,
     )
     db.add(course)

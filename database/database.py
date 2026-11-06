@@ -4,9 +4,11 @@
 设计说明（对应修改报告第 16、17 节）：
 
 * 默认使用 **MySQL**（mysql+pymysql://...），数据表由 SQLAlchemy 自动创建；
-* 若 MySQL 未启动或账号不可用，在 CLASSROOM_SQLITE_FALLBACK=1（默认）时
-  自动回退到项目根目录下的 SQLite 文件，保证系统在任何机器上都能直接运行，
-  便于答辩演示与自动化测试；
+* 默认**不**回退到 SQLite（``CLASSROOM_SQLITE_FALLBACK`` 缺省为 ``0``）：
+  MySQL 未启动或账号不可用时直接抛出 ``DatabaseConfigError`` 并给出配置提示，
+  避免静默切换到本地文件库导致数据分散；
+* 仅当显式设置 ``CLASSROOM_SQLITE_FALLBACK=1``（例如本机临时没有 MySQL 的
+  演示 / 自动测试环境）时，才回退到项目根目录下的 SQLite 文件；
 * 所有业务代码统一通过 get_db() 依赖注入数据库会话。
 """
 
@@ -103,12 +105,48 @@ def get_db() -> Iterator[Session]:
         session.close()
 
 
+def _check_schema() -> None:
+    """启动时检查表结构与 ORM 模型是否一致。
+
+    ``create_all`` 只会创建**不存在**的表，不会给已有的表补列。若代码升级新增了字段
+    而数据库没有同步迁移，查询会因 ``Unknown column`` 报 500。这里在启动阶段主动比对，
+    发现缺失时给出明确提示，避免运行期才暴露成内部错误。
+    """
+    from sqlalchemy import inspect as sa_inspect
+
+    from database import models  # noqa: F401
+
+    try:
+        inspector = sa_inspect(engine)
+        missing: list[str] = []
+        for table_name, table in Base.metadata.tables.items():
+            if not inspector.has_table(table_name):
+                missing.append(f"{table_name}（整表缺失）")
+                continue
+            existing = {col["name"] for col in inspector.get_columns(table_name)}
+            for column in table.columns:
+                if column.name not in existing:
+                    missing.append(f"{table_name}.{column.name}")
+        if missing:
+            detail = "、".join(missing)
+            logger.warning(
+                "数据库结构落后于代码：缺少 %s。请执行 tools/migrate_schema.py 补建，"
+                "否则相关接口会返回 500。",
+                detail,
+            )
+        else:
+            logger.info("数据库结构与模型一致（%d 张表）", len(Base.metadata.tables))
+    except Exception as exc:  # pragma: no cover - 检查失败不阻断启动
+        logger.warning("数据库结构检查跳过：%s", exc)
+
+
 def init_db() -> None:
     """创建全部数据表，并写入默认管理员账号。"""
     from database import models  # noqa: F401  确保模型已注册到 Base.metadata
 
     Base.metadata.create_all(bind=engine)
     logger.info("数据表初始化完成（共 %d 张表）", len(Base.metadata.tables))
+    _check_schema()
     _create_default_admin()
 
 

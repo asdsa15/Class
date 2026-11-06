@@ -60,6 +60,7 @@ CREATE TABLE course (
     teacher_id INT NOT NULL,
     class_name VARCHAR(50) NOT NULL DEFAULT '',
     classroom VARCHAR(50) NOT NULL DEFAULT '',
+    student_capacity INT NOT NULL DEFAULT 0 COMMENT '班级应到人数（0 表示未知，专注度按检出人数计算）',
     description TEXT,
     create_time DATETIME NOT NULL,
     PRIMARY KEY (id),

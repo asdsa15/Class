@@ -109,6 +109,7 @@ async def detect_image(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="图片解析失败")
 
     try:
+        capacity = int(getattr(getattr(session, "course", None), "student_capacity", 0) or 0) if session else 0
         result, plotted = await run_in_threadpool(
             detection_service.analyze_image,
             image,
@@ -116,6 +117,7 @@ async def detect_image(
             with_box,
             config.REALTIME_JPEG_QUALITY,
             hud,
+            capacity or None,
         )
     except ModelUnavailableError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
@@ -222,6 +224,8 @@ class _RealtimeState:
         self.mode_marked = False
         self.send_lock = asyncio.Lock()
         self.camera_task: asyncio.Task | None = None
+        # 班级应到人数：首次落库或校验连接时读取，供专注度以全班为分母计算
+        self.expected_students = 0
 
     async def send(self, websocket: WebSocket, message: dict[str, Any]) -> None:
         async with self.send_lock:
@@ -276,6 +280,7 @@ def _analyze_frame(state: _RealtimeState, db: Session, image: Any) -> dict[str, 
         with_plot=True,
         jpeg_quality=config.REALTIME_JPEG_QUALITY,
         hud=True,
+        expected_students=state.expected_students or None,
     )
     state.frame_index += 1
     state.frame_count += 1
@@ -391,6 +396,7 @@ async def classroom_realtime(websocket: WebSocket, session_id: int) -> None:
 
         await websocket.accept()
         state = _RealtimeState(session_id)
+        state.expected_students = int(getattr(session.course, "student_capacity", 0) or 0)
         detector = get_detector()
         await state.send(
             websocket,

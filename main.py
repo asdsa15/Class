@@ -26,8 +26,10 @@ import threading
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.exc import SQLAlchemyError
 
 import config
 
@@ -102,6 +104,28 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory=str(config.STATIC_DIR)), name="static")
 app.mount("/results", StaticFiles(directory=str(config.RESULT_DIR)), name="results")
+
+
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
+    """数据库异常兜底：把内部错误转换为可读提示，避免只返回一句 500。
+
+    最常见的触发原因是代码新增了字段但数据库未迁移（Unknown column）。
+    这里在返回 500 的同时给出明确的中文说明与处理步骤，便于自行修复。
+    """
+    message = str(getattr(exc, "orig", exc) or exc)
+    hint = "数据库操作失败"
+    if "Unknown column" in message or "no such column" in message:
+        hint = (
+            "数据库结构与代码不一致（缺少字段）。请执行 "
+            "tools/migrate_schema.py 完成结构升级后重试"
+        )
+    logger.error("数据库异常：%s | %s", message, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"{hint}（{request.url.path}）", "success": False},
+    )
+
 
 # 页面路由（不需要前缀），API 路由统一使用 /api 前缀
 app.include_router(pages.router)

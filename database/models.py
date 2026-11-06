@@ -66,6 +66,9 @@ class Course(Base):
     )
     class_name: Mapped[str] = mapped_column(String(50), default="", comment="班级")
     classroom: Mapped[str] = mapped_column(String(50), default="", comment="上课教室")
+    student_capacity: Mapped[int] = mapped_column(
+        Integer, default=0, comment="班级应到人数（0 表示未知，专注度按检出人数计算）"
+    )
     description: Mapped[str] = mapped_column(Text, default="", comment="课程简介")
     create_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, comment="创建时间")
 

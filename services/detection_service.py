@@ -56,11 +56,13 @@ def analyze_image(
     with_plot: bool = False,
     jpeg_quality: int = 75,
     hud: bool = False,
+    expected_students: int | None = None,
 ) -> tuple[AnalysisResult, np.ndarray | None]:
     """对单张图像执行完整分析：YOLOv8 检测 -> 行为统计 -> 专注度计算。
 
     :param with_plot: 是否返回绘制了检测框的图像；
-    :param hud: 是否在图像上叠加专注度信息面板（实时画面使用）。
+    :param hud: 是否在图像上叠加专注度信息面板（实时画面使用）；
+    :param expected_students: 班级应到人数，用于让专注度以全班为分母计算。
     """
     detector = get_detector()
     started = time.perf_counter()
@@ -68,7 +70,7 @@ def analyze_image(
     detect_time = time.perf_counter() - started
 
     summary = summarize_detections(detections)
-    attention = calculate_attention(summary.counts)
+    attention = calculate_attention(summary.counts, expected_students=expected_students)
     result = AnalysisResult(
         detections=detections, summary=summary, attention=attention, detect_time=detect_time
     )
@@ -84,9 +86,14 @@ def analyze_image(
 def _hud_lines(summary: BehaviorSummary, attention: AttentionResult) -> list[str]:
     """实时画面左上角信息面板的文字内容。"""
     score_text = f"{attention.score:.1f}%" if attention.score is not None else "--"
-    return [
+    lines = [
         f"课堂专注度：{score_text}  ({attention.level})",
-        f"学生人数：{summary.student_count}",
+        f"学生人数：{attention.student_count}"
+        + (
+            f"（检出 {attention.detected_students}）"
+            if attention.expected_students > 0
+            else ""
+        ),
         "  ".join(
             f"{config.behavior_cn(key)} {summary.counts.get(key, 0)}"
             for key in config.FOCUSED_BEHAVIORS
@@ -96,6 +103,9 @@ def _hud_lines(summary: BehaviorSummary, attention: AttentionResult) -> list[str
             for key in config.UNFOCUSED_BEHAVIORS
         ),
     ]
+    if attention.coverage_warning:
+        lines.append(attention.coverage_warning)
+    return lines
 
 
 def plot_detections(image: np.ndarray, detections: list[Detection]) -> np.ndarray:

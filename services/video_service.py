@@ -164,6 +164,8 @@ def process_video(task_id: str) -> None:
     last_record_time = 0.0
     db_session = SessionLocal() if session_id else None
     started_at = time.monotonic()
+    # 班级应到人数：用于以全班为分母计算专注度（0 表示未知）
+    expected_students = 0
 
     if db_session is not None:
         # 记录本课堂使用了视频分析方式，以及原始视频路径
@@ -171,6 +173,8 @@ def process_video(task_id: str) -> None:
         if session_row is not None:
             session_row.video_path = str(input_path)
             detection_service.mark_analysis_mode(db_session, session_row, "video")
+            course = getattr(session_row, "course", None)
+            expected_students = int(getattr(course, "student_capacity", 0) or 0)
 
     try:
         while True:
@@ -183,7 +187,9 @@ def process_video(task_id: str) -> None:
             if should_detect:
                 detections = detector.detect(frame)
                 summary = summarize_detections(detections)
-                attention = calculate_attention(summary.counts)
+                attention = calculate_attention(
+                    summary.counts, expected_students=expected_students
+                )
                 detected_frames += 1
                 if attention.score is not None:
                     attention_scores.append(float(attention.score))
@@ -192,7 +198,12 @@ def process_video(task_id: str) -> None:
                     plotted,
                     [
                         f"专注度：{attention.score:.1f}%" if attention.score is not None else "专注度：--",
-                        f"学生人数：{summary.student_count}",
+                        f"学生人数：{attention.student_count}"
+                        + (
+                            f"（检出 {attention.detected_students}）"
+                            if attention.expected_students > 0
+                            else ""
+                        ),
                         f"帧号：{index}",
                     ],
                 )
