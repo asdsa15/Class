@@ -1,16 +1,6 @@
 {% extends "base.html" %}
+{% block page_actions %}<span class="page-date" id="todayDate"></span>{% endblock %}
 {% block content %}
-<!-- 顶部欢迎区：产品化头部，体现当前用户与系统状态 -->
-<div class="welcome-bar">
-  <div class="welcome-left">
-    <h2 class="welcome-title" id="welcomeTitle">欢迎回来</h2>
-    <p class="welcome-sub" id="welcomeSub">课堂专注度分析系统 · 今日数据概览</p>
-  </div>
-  <div class="welcome-right">
-    <span class="date-chip" id="todayDate"></span>
-  </div>
-</div>
-
 <div class="panel">
   <div class="panel-head">
     <h2>数据概览</h2>

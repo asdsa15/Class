@@ -106,6 +106,20 @@ app.mount("/static", StaticFiles(directory=str(config.STATIC_DIR)), name="static
 app.mount("/results", StaticFiles(directory=str(config.RESULT_DIR)), name="results")
 
 
+@app.middleware("http")
+async def _no_cache_for_static(request: Request, call_next):
+    """静态资源强制走协商缓存。
+
+    StaticFiles 只发 ETag / Last-Modified 而不发 Cache-Control，浏览器会按
+    启发式规则长时间复用旧文件，表现为"改了 CSS 但页面没变化"。
+    这里补上 no-cache，让浏览器每次用 ETag 重新校验：内容没变是 304（几乎
+    零开销），内容变了立刻拿到新文件。"""
+    response = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return response
+
+
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
     """数据库异常兜底：把内部错误转换为可读提示，避免只返回一句 500。
