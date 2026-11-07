@@ -35,7 +35,7 @@ set PYTHONIOENCODING=utf-8
 
 echo [信息] 正在启动服务，请稍候...
 echo [信息] 服务地址： http://127.0.0.1:8000
-echo [信息] 默认账号： admin / admin123
+echo [信息] 启动完成后将自动打开登录页面
 echo.
 
 start "" /b powershell -NoProfile -ExecutionPolicy Bypass -Command "$u='http://127.0.0.1:8000/health'; for($i=0;$i -lt 60;$i++){ try{ $r=Invoke-WebRequest $u -UseBasicParsing -TimeoutSec 2; if($r.StatusCode -eq 200){ Start-Process 'http://127.0.0.1:8000'; break } }catch{} Start-Sleep -Seconds 1 }"

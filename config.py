@@ -238,7 +238,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = _get_int("CLASSROOM_TOKEN_EXPIRE_MINUTES", 12 * 60
 # 登录页"记住密码"（实现为记住登录状态）：勾选后登录有效期延长
 REMEMBER_ME_EXPIRE_MINUTES = _get_int("CLASSROOM_REMEMBER_EXPIRE_MINUTES", 30 * 24 * 60)
 COOKIE_NAME = "classroom_token"
-ROLES = {"admin": "管理员", "teacher": "教师"}
+ROLES = {"admin": "系统管理员", "teacher": "教师"}
 # 账号状态：1 正常 / 0 已禁用
 USER_STATUS = {1: "正常", 0: "已禁用"}
 # 登录失败次数限制（防止暴力破解）

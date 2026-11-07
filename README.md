@@ -119,11 +119,13 @@ pip install -r requirements.txt
 .venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-浏览器访问 <http://127.0.0.1:8000>，默认管理员账号：
+浏览器访问 <http://127.0.0.1:8000>，未登录时会自动跳转到登录页面。
 
-| 账号 | 密码 | 角色 |
-|---|---|---|
-| admin | admin123 | 管理员 |
+> **首次部署说明**：系统在数据库为空时会自动创建一个管理员账号，其账号与密码取自
+> `.env` 中的 `CLASSROOM_ADMIN_USER` / `CLASSROOM_ADMIN_PASSWORD`（默认值见 `config.py` 的
+> `DEFAULT_ADMIN`）。该默认账号**仅用于首次初始化**，登录后请立即在「个人中心」修改密码；
+> 生产环境建议在 `.env` 中显式设置强密码，并将 `CLASSROOM_CREATE_ADMIN` 设为 `0`，
+> 改用管理员在「用户管理」中手动创建账号。
 
 ### 3. 运行自检（验证环境是否正常）
 

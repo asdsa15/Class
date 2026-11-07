@@ -12,7 +12,7 @@
   <div class="app-header-right">
     <span id="modelStatus">模型状态：检查中</span>
     <div class="sep"></div>
-<a href="/profile" style="color:inherit;text-decoration:none">{{ user.real_name or user.username }}（{{ user.role_name }}）</a>
+<a href="/profile" style="color:inherit;text-decoration:none">{% if user.role == 'admin' %}{{ user.role_name }}{% else %}{{ user.real_name or user.username }}（{{ user.role_name }}）{% endif %}</a>
     <button type="button" class="link-btn" id="logoutBtn">退出登录</button>
   </div>
 </header>

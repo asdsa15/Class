@@ -169,7 +169,7 @@ def health() -> dict:
 if __name__ == "__main__":
     print(f"\n{APP_NAME} v{APP_VERSION}")
     print(f"访问地址： http://{config.SERVER_HOST}:{config.SERVER_PORT}")
-    print("默认账号： admin / admin123\n")
+    print("请在浏览器中打开上述地址，使用已分配的账号登录\n")
     uvicorn.run(
         "main:app",
         host=config.SERVER_HOST,
