@@ -1,37 +1,32 @@
 {% extends "base.html" %}
 {% block page_actions %}<span class="page-date" id="todayDate"></span>{% endblock %}
 {% block content %}
-<div class="panel">
-  <div class="panel-head">
-    <h2>数据概览</h2>
-    <span class="panel-extra" id="overviewScope"></span>
+<span class="metrics-note" id="overviewScope"></span>
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">课程数量</div>
+    <div class="metric-value" id="courseCount">--</div>
+    <div class="metric-foot">已开设课程总数</div>
   </div>
-  <div class="metrics">
-    <div class="metric">
-      <div class="metric-label">课程数量</div>
-      <div class="metric-value" id="courseCount">--</div>
-      <div class="metric-foot">已开设课程总数</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">课堂数量</div>
-      <div class="metric-value" id="sessionCount">--</div>
-      <div class="metric-foot">累计分析课堂</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">今日课堂</div>
-      <div class="metric-value" id="todayCount">--</div>
-      <div class="metric-foot">今日进行的课堂</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">平均专注度</div>
-      <div class="metric-value" id="avgAttention">--</div>
-      <div class="metric-foot" id="avgAttentionFoot">全部课堂平均值</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">进行中的课堂</div>
-      <div class="metric-value" id="runningCount">--</div>
-      <div class="metric-foot">正在检测中</div>
-    </div>
+  <div class="metric">
+    <div class="metric-label">课堂数量</div>
+    <div class="metric-value" id="sessionCount">--</div>
+    <div class="metric-foot">累计分析课堂</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">今日课堂</div>
+    <div class="metric-value" id="todayCount">--</div>
+    <div class="metric-foot">今日进行的课堂</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">平均专注度</div>
+    <div class="metric-value" id="avgAttention">--</div>
+    <div class="metric-foot" id="avgAttentionFoot">全部课堂平均值</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">进行中的课堂</div>
+    <div class="metric-value" id="runningCount">--</div>
+    <div class="metric-foot">正在检测中</div>
   </div>
 </div>
 

@@ -3,12 +3,12 @@
    ========================================================================== */
 
 const BEHAVIOR_COLORS = {
-  hand_raising: '#2b6cb0',
-  reading: '#2f855a',
-  writing: '#6b46c1',
-  using_phone: '#c53030',
-  bowing_head: '#c2760b',
-  leaning_over_table: '#7b8794',
+  hand_raising: '#3d7a5c',
+  reading: '#4f6b7a',
+  writing: '#6b7f5a',
+  using_phone: '#a5443c',
+  bowing_head: '#9a6b1e',
+  leaning_over_table: '#8a8378',
 };
 
 const BEHAVIOR_ORDER = ['hand_raising', 'reading', 'writing', 'using_phone', 'bowing_head', 'leaning_over_table'];
@@ -106,13 +106,13 @@ function attentionClass(score) {
 }
 
 function statusBadge(status) {
-  if (status === 'running') return '<span style="color:#c2760b">进行中</span>';
-  if (status === 'finished') return '<span style="color:#2f9e44">已结束</span>';
+  if (status === 'running') return '<span style="color:#9a6b1e">进行中</span>';
+  if (status === 'finished') return '<span style="color:#3d7a5c">已结束</span>';
   return esc(status);
 }
 
 function behaviorColor(key) {
-  return BEHAVIOR_COLORS[key] || '#7b8794';
+  return BEHAVIOR_COLORS[key] || '#8a8378';
 }
 
 function initTabs(root) {

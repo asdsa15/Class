@@ -4,9 +4,9 @@
    ========================================================================== */
 
 var Chart = (function () {
-  var GRID = '#eef0f3';
-  var AXIS_TEXT = '#909399';
-  var VALUE_TEXT = '#606266';
+  var GRID = '#ece9e2';
+  var AXIS_TEXT = '#9a938a';
+  var VALUE_TEXT = '#6b645c';
   var FONT = '11px "Microsoft YaHei", "微软雅黑", sans-serif';
 
   function setup(canvas, height) {
@@ -47,7 +47,7 @@ var Chart = (function () {
     var chartH = height - pad.top - pad.bottom;
     var min = options.min === undefined ? 0 : options.min;
     var max = options.max === undefined ? 100 : options.max;
-    var color = options.color || '#2b6cb0';
+    var color = options.color || '#5a4a3c';
 
     function yOf(value) { return pad.top + chartH - ((value - min) / (max - min)) * chartH; }
     function xOf(index) {
@@ -161,7 +161,7 @@ var Chart = (function () {
       var barHeight = Math.max((value / max) * chartH, value > 0 ? 2 : 0);
       var x = pad.left + slot * index + (slot - barWidth) / 2;
       var y = pad.top + chartH - barHeight;
-      ctx.fillStyle = (options.colors && options.colors[index]) || options.color || '#2b6cb0';
+      ctx.fillStyle = (options.colors && options.colors[index]) || options.color || '#5a4a3c';
       ctx.fillRect(x, y, barWidth, barHeight);
       ctx.textAlign = 'center';
       if (value > 0) {
@@ -195,7 +195,7 @@ var Chart = (function () {
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, start, start + angle);
       ctx.closePath();
-      ctx.fillStyle = item.color || '#2b6cb0';
+      ctx.fillStyle = item.color || '#5a4a3c';
       ctx.fill();
       start += angle;
     });
@@ -205,7 +205,7 @@ var Chart = (function () {
     ctx.fillStyle = '#fff';
     ctx.fill();
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#303133';
+    ctx.fillStyle = '#2e2a26';
     ctx.font = '600 16px "Microsoft YaHei", sans-serif';
     ctx.fillText(String(total), centerX, centerY + 1);
     ctx.fillStyle = AXIS_TEXT;

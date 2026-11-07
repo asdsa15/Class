@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page_title }} - 课堂专注度分析系统</title>
-  <link rel="stylesheet" href="/static/css/style.css?v=20261107a">
+  <link rel="stylesheet" href="/static/css/style.css?v=20261107b">
 </head>
 <body>
 <header class="app-header">
@@ -61,13 +61,13 @@
     var model = data.model || {};
     if (!model.model_exists) {
       box.textContent = '模型文件缺失';
-      box.style.color = '#d92d20';
+      box.style.color = '#a5443c';
     } else if (model.loaded) {
       box.textContent = '检测模型已加载';
-      box.style.color = '#2f9e44';
+      box.style.color = '#3d7a5c';
     } else {
       box.textContent = '检测模型待加载';
-      box.style.color = '#909399';
+      box.style.color = '#9a938a';
     }
   }).catch(function () { /* 忽略状态获取失败 */ });
 </script>
